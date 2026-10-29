@@ -10,6 +10,7 @@ import com.vincenthzr.locationspoofer.data.model.MapEngine
 import com.vincenthzr.locationspoofer.ui.components.map.AMapViewContainer
 import com.vincenthzr.locationspoofer.ui.components.map.BaiduMapViewContainer
 import com.vincenthzr.locationspoofer.ui.components.map.GoogleMapViewContainer
+import com.vincenthzr.locationspoofer.ui.components.map.TencentMapViewContainer
 
 interface AppMapMarker {
     fun setPosition(lat: Double, lng: Double)
@@ -81,6 +82,17 @@ fun AppMapView(
     }
 
     when (activeEngine) {
+        MapEngine.TENCENT -> {
+            TencentMapViewContainer(
+                context = context,
+                lifecycleOwner = lifecycleOwner,
+                isDark = isDark,
+                modifier = modifier,
+                onMapReady = onMapReady,
+                onControllerCreated = { mapController = it }
+            )
+        }
+
         MapEngine.BAIDU -> {
             BaiduMapViewContainer(
                 context = context,

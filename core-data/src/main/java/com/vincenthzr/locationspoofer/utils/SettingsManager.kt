@@ -55,6 +55,10 @@ class SettingsManager(context: Context) {
         get() = prefs.getString("google_api_key", "") ?: ""
         set(value) = prefs.edit().putString("google_api_key", value).apply()
 
+    var tencentApiKey: String
+        get() = prefs.getString("tencent_api_key", "") ?: ""
+        set(value) = prefs.edit().putString("tencent_api_key", value).apply()
+
     var wigleApiToken: String
         get() = prefs.getString("wigle_api_token", "") ?: ""
         set(value) = prefs.edit().putString("wigle_api_token", value).apply()

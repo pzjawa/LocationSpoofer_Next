@@ -67,6 +67,7 @@ internal fun MainViewModel.initialize() {
                 amapApiKey = settingsRepository.getAmapApiKey(),
                 baiduApiKey = settingsRepository.getBaiduApiKey(),
                 googleApiKey = settingsRepository.getGoogleApiKey(),
+                tencentApiKey = settingsRepository.getTencentApiKey(),
                 appSha1 = getAppSignatureSHA1(),
                 checkBetaUpdates = settingsRepository.checkBetaUpdates
             )
@@ -471,6 +472,11 @@ internal fun MainViewModel.setBaiduApiKey(key: String) {
 internal fun MainViewModel.setGoogleApiKey(key: String) {
     settingsRepository.setGoogleApiKey(key)
     _uiState.update { it.copy(googleApiKey = key) }
+}
+
+internal fun MainViewModel.setTencentApiKey(key: String) {
+    settingsRepository.setTencentApiKey(key)
+    _uiState.update { it.copy(tencentApiKey = key) }
 }
 
 internal fun MainViewModel.setWigleApiToken(token: String) {

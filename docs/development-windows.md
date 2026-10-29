@@ -79,6 +79,12 @@ SDK 37 的正式安装包名为 `platforms;android-37.0`；本地准备 `build-t
 
 APK 分别输出到 `app/build/outputs/apk/scoped/debug/` 和 `app/build/outputs/apk/global/debug/`，按 `arm64-v8a`、`armeabi-v7a` 拆分。Debug 构建未配置发布密钥时自动使用调试签名，不需要为了本地初始化申请发布密钥。Google Maps Key 可留空，需要 Google 地图时再配置。
 
+全局定位与厂商适配入口只在 `global` 包中显示；需要全局修改时不要安装 `scoped` 包。两个变体使用同一应用包名与签名时可覆盖安装，切换后需在 LSPosed 检查作用域并重启手机。
+
+腾讯地图设置页的自定义 Key 可以留空，但只有构建时通过 `TENCENT_MAPS_API_KEY` 配置了有效 Key 才能使用腾讯底图；自定义 Key 和构建 Key 均为空时，应用会提示配置，不提供免 Key 模式。
+
+检查 arm64 APK 的 16 KB 兼容性时，同时检查解包后每个 `.so` 的 ELF `LOAD` 对齐是否至少为 `0x4000`，以及运行 Android Build-Tools 的 `zipalign -c -P 16 4 <APK>`。压缩打包、重新签名或仅在 4 KB 页面手机上启动，不能修复第三方 SDK 的 4 KB ELF 段；应升级 SDK 后重新构建。
+
 连接测试设备后，选择一种方案安装：
 
 ```powershell

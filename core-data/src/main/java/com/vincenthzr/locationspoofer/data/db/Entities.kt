@@ -270,12 +270,14 @@ data class ExportedSettings(
 /**
  * API 密钥属于个人凭据，与普通设置分开成一类，导出时默认不勾选：
  * 分享给他人的文件里带上密钥，等于把自己实名认证的开发者配额交出去。
+ * 腾讯密钥同样只随显式勾选的密钥分类导出；旧文件缺少该字段时默认为空。
  */
 @Serializable
 data class ExportedApiKeys(
     val amapApiKey: String = "",
     val baiduApiKey: String = "",
     val googleApiKey: String = "",
+    val tencentApiKey: String = "",
     val wigleApiToken: String = "",
     val opencellidApiToken: String = ""
 )

@@ -50,7 +50,7 @@ Powered by **KernelSU / APatch / Magisk** for root privileges and **LSPosed (lib
         │                            │                            │
         ▼                            ▼                            ▼
   【Spatial & Physics】        【Radio & Sensors】            【Anti-Detection】
-  • Triple Map Engine          • Wi-Fi Scan & Connection      • Xposed Stack Frame Scrubbing
+  • Four Map Engines           • Wi-Fi Scan & Connection      • Xposed Stack Frame Scrubbing
   • WGS-84/GCJ-02/BD-09 Auto   • 2G-5G NR Cell Towers         • ClassLoader Isolation
   • Ornstein-Uhlenbeck Jitter  • BLE Beacons Filtering        • isFromMockProvider Erased
   • Gait Noise & Drift         • WiGLE / OpenCellID Import    • AppOps OP_MOCK_LOCATION Masked
@@ -59,9 +59,11 @@ Powered by **KernelSU / APatch / Magisk** for root privileges and **LSPosed (lib
 ```
 
 ### 1. Multi-Map Engines & Coordinate Adaptation
-* **Triple Engine Support**: Natively integrates AMap 3D, Baidu Maps, and Google Maps for flexible worldwide POI search and road-network routing.
+* **Four Map Engines**: Integrates AMap 3D, Baidu Maps, Google Maps, and Tencent Maps for point selection and route display on different basemaps.
 * **Out-of-the-Box & Multilingual Support**: Default "Auto Match" smoothly uses AMap across all languages (including Chinese, English, Arabic, etc.), functioning without requiring Google Play Services or proxy setups.
 * **Custom Google API Key**: No default Google Maps API Key is embedded. To use Google Maps rendering and Places global search, simply input your own Google API Key in the Settings page.
+* **Tencent Maps**: Uses map SDK 6.15.1. Select Tencent in Settings → Map Configuration, enter your own Android Map SDK Key, and save. First use requires reading and accepting Tencent's privacy rules. No Tencent Key is bundled and a missing Key does not silently switch providers. Builds can supply a default via `TENCENT_MAPS_API_KEY` in the environment or `TENCENT_MAPS_API_KEY: "your-key"` in root `local.yml`; the in-app custom Key takes precedence. Enable Map SDK for the Key in the [Tencent location console](https://lbs.qq.com/dev/console/application/mine) and configure package `com.vincenthzr.locationspoofer`. Coordinates remain GCJ-02; address search and route planning retain existing services. Keys are exported only when explicitly selected; privacy consent is never exported.
+* **16 KB native alignment**: AMap uses the combined `3dmap-location-search:11.3.100_loc11.3.101_sea9.8.1` artifact without duplicate standalone location/search SDKs; Baidu Map/Search use `7.6.6`, and Location uses `9.6.5`. Check both ELF `LOAD` alignment (at least `0x4000`) and ZIP alignment in arm64 APKs. APK signature verification or startup on a 4 KB device alone does not prove 16 KB compatibility.
 * **Smart Automatic Coordinate Adaptation (Smart Auto)**:
   * Native Android framework APIs consistently output standard `WGS-84` physical coordinates and satellite metadata;
   * Third-party map SDKs (AMap, Tencent, Baidu) and rendering layers (e.g., BaiduMap `MyLocationData` blue dot) automatically map to their respective coordinate systems (`GCJ-02` / `BD-09`), eliminating shifts and `(0.0, 0.0)` fallback pulls;
@@ -147,8 +149,8 @@ Both variants deliver JSON through libxposed remote configuration; hooks read an
 ┌─────────────────────────────────────────────────────────────────────────┐
 │       LocationSpoofer Host Process (app/app-ui/service/core-data)       │
 │  ┌─────────────────────────┐  ┌──────────────────────────────────────┐  │
-│  │     Triple Map Engine   │  │          RouteStateMachine           │  │
-│  │ (AMap / Baidu / Google) │  │     (IDLE / READY / RUN / PAUSE)     │  │
+│  │     Four Map Engines    │  │          RouteStateMachine           │  │
+│  │ AMap/Baidu/Google/Tencent│  │     (IDLE / READY / RUN / PAUSE)     │  │
 │  └────────────┬────────────┘  └──────────────────┬───────────────────┘  │
 │               │                                  │                      │
 │  ┌────────────▼──────────────────────────────────▼───────────────────┐  │
@@ -212,15 +214,20 @@ The global scheme hooks system services directly, and their internals differ bet
 # 1. Clone the repository
 git clone https://github.com/your-username/LocationSpoofer.git
 
-# 2. Build and install Debug APK
-./gradlew installDebug
+# 2. Build and install the global variant (hooks system processes)
+./gradlew :app:installGlobalDebug
+#
+# Or choose the non-global variant (hooks LSPosed-selected target apps)
+# ./gradlew :app:installScopedDebug
 ```
+
+Install one variant: they share a package name and replace each other. System-wide settings are available only in `global`, not `scoped`. arm64 APKs are under `app/build/outputs/apk/global/debug/` and `app/build/outputs/apk/scoped/debug/`, respectively.
 
 ### 2. Activation
 1. Open **KernelSU / APatch / Magisk** and grant Root permissions to LocationSpoofer.
 2. Open **LSPosed Manager**, find **LocationSpoofer**, and **enable it**.
-3. Under the module's scope, **check the target apps** you wish to spoof (e.g. WeChat, DingTalk, XuexiTong, Baidu Maps).
-4. **Force stop** target apps or reboot your phone to apply the hooks.
+3. For the global variant, select **System Framework, Phone, and Bluetooth** in the module scope; for the scoped variant, select the target apps to spoof.
+4. **Reboot after enabling or switching to the global variant** so system processes load the hooks. For the scoped variant, force stop and reopen selected target apps.
 
 ### 3. Usage Scenarios
 
@@ -257,7 +264,7 @@ git clone https://github.com/your-username/LocationSpoofer.git
 * **Dependency Injection**: Koin, split per module into `coreDataModule` / `serviceModule` / `viewModelModule`, aggregated by `appModules` in the `app` module
 * **Local Storage**: Room Database (SQLite) + Spatial Indexing (in `core-data`)
 * **Networking & Serialization**: OkHttp 3 + Kotlinx Serialization
-* **Map SDKs**: AMap 3DMap SDK / BaiduMap SDK / Google Maps & Places SDK
+* **Map SDKs**: AMap 11.3.100 (combined map/location/search) / BaiduMap 7.6.6 + Location 9.6.5 / Google Maps & Places SDK / Tencent Map SDK 6.15.1 (with foundation)
 * **Xposed Hooking**: LSPosed API 101+ / libxposed (Service mode); hook implementations live under `xposed`'s `hooks/` and `hooks/network/` packages
 
 ---

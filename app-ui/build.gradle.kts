@@ -92,10 +92,11 @@ dependencies {
 
     implementation(libs.koin.androidx.compose)
     implementation(libs.amap.map)
-    implementation(libs.amap.search)
     implementation(libs.baidu.map)
     implementation(libs.baidu.location)
     implementation(libs.baidu.search)
+    implementation(libs.tencent.map)
+    implementation(libs.tencent.foundation)
     implementation(libs.google.maps)
     implementation(libs.google.places)
     implementation(libs.kotlinx.serialization.json)
