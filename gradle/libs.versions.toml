@@ -8,11 +8,11 @@ composeBom = "2026.06.01"
 koin = "3.5.3"
 libxposed = "102.0.0"
 libxposedService = "102.0.0"
-amap = "10.0.600"
-amapLocation = "6.4.9"
-amapSearch = "9.7.0"
-baiduMap = "7.6.4"
-baiduLocation = "9.6.4"
+amap = "11.3.100_loc11.3.101_sea9.8.1"
+baiduMap = "7.6.6"
+baiduLocation = "9.6.5"
+tencentMap = "6.15.1.261013.3d797fb0.242708926"
+tencentFoundation = "0.9.1.6875646"
 okhttp = "4.12.0"
 googleMaps = "20.0.0"
 playServicesLocation = "21.2.0"
@@ -27,12 +27,12 @@ orgJson = "20231013"
 
 [libraries]
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
-amap-map = { module = "com.amap.api:3dmap", version.ref = "amap" }
-amap-location = { module = "com.amap.api:location", version.ref = "amapLocation" }
-amap-search = { module = "com.amap.api:search", version.ref = "amapSearch" }
+amap-map = { module = "com.amap.api:3dmap-location-search", version.ref = "amap" }
 baidu-map = { module = "com.baidu.lbsyun:BaiduMapSDK_Map", version.ref = "baiduMap" }
 baidu-location = { module = "com.baidu.lbsyun:BaiduMapSDK_Location", version.ref = "baiduLocation" }
 baidu-search = { module = "com.baidu.lbsyun:BaiduMapSDK_Search", version.ref = "baiduMap" }
+tencent-map = { module = "com.tencent.map:tencent-map-vector-sdk", version.ref = "tencentMap" }
+tencent-foundation = { module = "com.tencent.openmap:foundation", version.ref = "tencentFoundation" }
 xposed-api = { group = "io.github.libxposed", name = "api", version.ref = "libxposed" }
 xposed-service = { group = "io.github.libxposed", name = "service", version.ref = "libxposedService" }
 google-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "googleMaps" }

@@ -27,6 +27,8 @@ android {
 
     val googleMapsApiKey =
         System.getenv("GOOGLE_MAPS_API_KEY") ?: getLocalConfig("GOOGLE_MAPS_API_KEY") ?: ""
+    val tencentMapsApiKey =
+        System.getenv("TENCENT_MAPS_API_KEY") ?: getLocalConfig("TENCENT_MAPS_API_KEY") ?: ""
 
     defaultConfig {
         applicationId = "com.vincenthzr.locationspoofer"
@@ -41,6 +43,7 @@ android {
         }
 
         manifestPlaceholders["googleMapsApiKey"] = googleMapsApiKey
+        manifestPlaceholders["tencentMapsApiKey"] = tencentMapsApiKey
 
         splits {
             abi {
@@ -144,7 +147,6 @@ dependencies {
     implementation(libs.xposed.service)
     implementation(libs.koin.androidx.compose)
     implementation(libs.amap.map)
-    implementation(libs.amap.search)
     implementation(libs.baidu.map)
     implementation(libs.google.places)
     implementation(libs.androidx.core.ktx)

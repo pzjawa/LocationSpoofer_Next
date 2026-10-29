@@ -46,7 +46,7 @@ class LocationSpooferDataPackageTest {
         assertTrue(text.contains("\"apiKeys\": null"))
         // 任何一个密钥字段名都不应该出现在文件里
         listOf(
-            "amapApiKey", "baiduApiKey", "googleApiKey",
+            "amapApiKey", "baiduApiKey", "googleApiKey", "tencentApiKey",
             "wigleApiToken", "opencellidApiToken"
         ).forEach { field ->
             assertFalse("导出文件里不应出现密钥字段 $field", text.contains(field))
@@ -56,11 +56,36 @@ class LocationSpooferDataPackageTest {
     @Test
     fun `勾选密钥时导出的 JSON 才会带上密钥`() {
         val pkg = LocationSpooferDataPackage(
-            apiKeys = ExportedApiKeys(amapApiKey = "test-amap-key")
+            apiKeys = ExportedApiKeys(
+                amapApiKey = "test-amap-key",
+                tencentApiKey = "test-tencent-key"
+            )
         )
         val text = exportJson.encodeToString(pkg)
         assertTrue(text.contains("amapApiKey"))
         assertTrue(text.contains("test-amap-key"))
+        assertTrue(text.contains("\"tencentApiKey\": \"test-tencent-key\""))
+        val restored = importJson.decodeFromString<LocationSpooferDataPackage>(text)
+        assertEquals("test-tencent-key", restored.apiKeys?.tencentApiKey)
+    }
+
+    @Test
+    fun `旧的密钥对象缺少腾讯密钥时默认留空且保留原有密钥`() {
+        val legacyKeys = """
+            {
+              "version": 4,
+              "apiKeys": {
+                "amapApiKey": "legacy-amap-key",
+                "googleApiKey": "legacy-google-key"
+              }
+            }
+        """.trimIndent()
+
+        val restored = importJson.decodeFromString<LocationSpooferDataPackage>(legacyKeys)
+
+        assertEquals("", restored.apiKeys?.tencentApiKey)
+        assertEquals("legacy-amap-key", restored.apiKeys?.amapApiKey)
+        assertEquals("legacy-google-key", restored.apiKeys?.googleApiKey)
     }
 
     @Test
@@ -105,9 +130,12 @@ class LocationSpooferDataPackageTest {
                 altitude = "12.5",
                 satelliteCount = "18",
                 mapType = "SATELLITE",
-                mapEngine = "AMAP"
+                mapEngine = "TENCENT"
             ),
-            apiKeys = ExportedApiKeys(baiduApiKey = "bd-key")
+            apiKeys = ExportedApiKeys(
+                baiduApiKey = "bd-key",
+                tencentApiKey = "tencent-sensitive-key"
+            )
         )
 
         val restored = importJson.decodeFromString<LocationSpooferDataPackage>(
@@ -117,6 +145,7 @@ class LocationSpooferDataPackageTest {
         assertEquals(4, restored.version)
         assertEquals(original.settings, restored.settings)
         assertEquals(original.apiKeys, restored.apiKeys)
+        assertEquals("tencent-sensitive-key", restored.apiKeys?.tencentApiKey)
         assertEquals(original.savedLocations, restored.savedLocations)
         assertEquals(original.appCoordinateSystems, restored.appCoordinateSystems)
     }

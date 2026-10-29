@@ -124,6 +124,7 @@ data class AppState(
     val amapApiKey: String = "",
     val baiduApiKey: String = "",
     val googleApiKey: String = "",
+    val tencentApiKey: String = "",
     val wigleToken: String = "",
     val opencellidToken: String = "",
     val appSha1: String = "",

@@ -461,6 +461,7 @@ internal fun MainViewModel.exportEnvironmentData(
                     amapApiKey = settingsRepository.getAmapApiKey(),
                     baiduApiKey = settingsRepository.getBaiduApiKey(),
                     googleApiKey = settingsRepository.getGoogleApiKey(),
+                    tencentApiKey = settingsRepository.getTencentApiKey(),
                     wigleApiToken = settingsRepository.getWigleApiToken(),
                     opencellidApiToken = settingsRepository.getOpencellidApiToken()
                 )
@@ -647,6 +648,7 @@ internal fun MainViewModel.applyImportPackage(
                     if (k.amapApiKey.isNotBlank()) settingsRepository.setAmapApiKey(k.amapApiKey)
                     if (k.baiduApiKey.isNotBlank()) settingsRepository.setBaiduApiKey(k.baiduApiKey)
                     if (k.googleApiKey.isNotBlank()) settingsRepository.setGoogleApiKey(k.googleApiKey)
+                    if (k.tencentApiKey.isNotBlank()) settingsRepository.setTencentApiKey(k.tencentApiKey)
                     if (k.wigleApiToken.isNotBlank()) settingsRepository.setWigleApiToken(k.wigleApiToken)
                     if (k.opencellidApiToken.isNotBlank()) {
                         settingsRepository.setOpencellidApiToken(k.opencellidApiToken)
@@ -671,6 +673,7 @@ internal fun MainViewModel.applyImportPackage(
                     amapApiKey = settingsRepository.getAmapApiKey(),
                     baiduApiKey = settingsRepository.getBaiduApiKey(),
                     googleApiKey = settingsRepository.getGoogleApiKey(),
+                    tencentApiKey = settingsRepository.getTencentApiKey(),
                     mapType = try {
                         AppMapType.valueOf(settingsRepository.getMapType())
                     } catch (e: Exception) {

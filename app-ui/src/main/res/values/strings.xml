@@ -201,6 +201,12 @@
     <string name="custom_baidu_key_hint">Enter your Baidu Map key...</string>
     <string name="custom_google_key">Custom Google API Key</string>
     <string name="custom_google_key_hint">Enter your Google Map key...</string>
+    <string name="custom_tencent_key">Custom Tencent API Key</string>
+    <string name="custom_tencent_key_hint">Enter your Tencent Maps key...</string>
+    <string name="tencent_privacy_title">Tencent Maps Privacy Notice</string>
+    <string name="tencent_privacy_message">Tencent Maps uses the Tencent Map SDK to display maps. The SDK may process device, network, and location information as described in its privacy policy. Read the policy before agreeing: https://privacy.qq.com/document/preview/a10a8634f237464da9a95f4f07e73e40\n\nThe SDK will only be initialized after you agree. If you do not agree, you can select another map engine.</string>
+    <string name="tencent_privacy_agree">Agree and continue</string>
+    <string name="tencent_key_required">Please configure your Tencent Maps API Key in Settings first</string>
     <string name="google_key_required_hint">Please configure your Google Maps API Key in Settings first</string>
     <string name="copy">Copy</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
@@ -326,6 +332,7 @@
     <string name="map_engine_amap">AMap</string>
     <string name="map_engine_baidu">Baidu Map</string>
     <string name="map_engine_google">Google Maps</string>
+    <string name="engine_tencent">Tencent Maps</string>
     <string name="located_to_location">Located to "%s"</string>
     <string name="located_to_saved_point">Located to favorite "%s"</string>
     <string name="starting_ellipsis">Starting...</string>
@@ -428,6 +435,7 @@
     <string name="engine_amap_short">AMap</string>
     <string name="engine_baidu_short">Baidu</string>
     <string name="engine_google_short">Google</string>
+    <string name="engine_tencent_short">Tencent</string>
     <string name="env_and_signature">Environment &amp; Signature</string>
     <string name="api_key_binding_desc">Used for map developer platform API key registration</string>
     <string name="reading_signature">Reading signature...</string>

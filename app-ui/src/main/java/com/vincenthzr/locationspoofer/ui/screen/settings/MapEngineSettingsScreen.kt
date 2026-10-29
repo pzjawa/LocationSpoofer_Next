@@ -45,10 +45,12 @@ import com.vincenthzr.locationspoofer.viewmodel.MainViewModel
 import com.vincenthzr.locationspoofer.viewmodel.setAmapApiKey
 import com.vincenthzr.locationspoofer.viewmodel.setBaiduApiKey
 import com.vincenthzr.locationspoofer.viewmodel.setGoogleApiKey
+import com.vincenthzr.locationspoofer.viewmodel.setTencentApiKey
 import com.vincenthzr.locationspoofer.viewmodel.setKeepLastMapPosition
 import com.vincenthzr.locationspoofer.viewmodel.setMapEngine
 import top.yukonga.miuix.kmp.basic.Card as MiuixCard
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MapEngineSettingsScreen(
     viewModel: MainViewModel,
@@ -60,6 +62,7 @@ fun MapEngineSettingsScreen(
     var localAmapApiKey by remember(uiState.amapApiKey) { mutableStateOf(uiState.amapApiKey) }
     var localBaiduApiKey by remember(uiState.baiduApiKey) { mutableStateOf(uiState.baiduApiKey) }
     var localGoogleApiKey by remember(uiState.googleApiKey) { mutableStateOf(uiState.googleApiKey) }
+    var localTencentApiKey by remember(uiState.tencentApiKey) { mutableStateOf(uiState.tencentApiKey) }
 
     BackHandler(onBack = onClose)
 
@@ -168,7 +171,7 @@ fun MapEngineSettingsScreen(
 
                         Spacer(Modifier.height(14.dp))
 
-                        // 地图引擎 4 分段选择器
+                        // 地图引擎选择器
                         Text(
                             text = stringResource(R.string.current_engine),
                             fontSize = 12.sp,
@@ -176,15 +179,18 @@ fun MapEngineSettingsScreen(
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
                         Spacer(Modifier.height(6.dp))
-                        Row(
+                        FlowRow(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            maxItemsInEachRow = 3
                         ) {
                             val engines = listOf(
                                 MapEngine.AUTO to stringResource(R.string.engine_auto_short),
                                 MapEngine.AMAP to stringResource(R.string.engine_amap_short),
                                 MapEngine.BAIDU to stringResource(R.string.engine_baidu_short),
-                                MapEngine.GOOGLE to stringResource(R.string.engine_google_short)
+                                MapEngine.GOOGLE to stringResource(R.string.engine_google_short),
+                                MapEngine.TENCENT to stringResource(R.string.engine_tencent_short)
                             )
                             engines.forEach { (engine, label) ->
                                 val isSelected = uiState.mapEngine == engine
@@ -213,7 +219,7 @@ fun MapEngineSettingsScreen(
 
                         // 各引擎自定义 API Key 输入
                         AnimatedVisibility(
-                            visible = uiState.mapEngine == MapEngine.AMAP || uiState.mapEngine == MapEngine.BAIDU || uiState.mapEngine == MapEngine.GOOGLE,
+                            visible = uiState.mapEngine != MapEngine.AUTO,
                             enter = fadeIn(),
                             exit = fadeOut()
                         ) {
@@ -249,6 +255,16 @@ fun MapEngineSettingsScreen(
                                         )
                                     }
 
+                                    MapEngine.TENCENT -> {
+                                        ModernSettingsInput(
+                                            label = stringResource(R.string.custom_tencent_key),
+                                            value = localTencentApiKey,
+                                            onValueChange = { localTencentApiKey = it },
+                                            placeholder = stringResource(R.string.custom_tencent_key_hint),
+                                            isDark = isDark
+                                        )
+                                    }
+
                                     else -> Unit
                                 }
                             }
@@ -260,6 +276,7 @@ fun MapEngineSettingsScreen(
                             viewModel.setAmapApiKey(localAmapApiKey)
                             viewModel.setBaiduApiKey(localBaiduApiKey)
                             viewModel.setGoogleApiKey(localGoogleApiKey)
+                            viewModel.setTencentApiKey(localTencentApiKey)
                             Toast.makeText(
                                 context,
                                 context.getString(R.string.restart_required_hint),

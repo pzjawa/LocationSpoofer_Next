@@ -123,12 +123,14 @@ fun InfoTab(
     val amapText = stringResource(R.string.map_engine_amap)
     val baiduText = stringResource(R.string.map_engine_baidu)
     val googleText = stringResource(R.string.map_engine_google)
-    val currentEngineName = remember(uiState.mapEngine, autoText, amapText, baiduText, googleText) {
+    val tencentText = stringResource(R.string.engine_tencent)
+    val currentEngineName = remember(uiState.mapEngine, autoText, amapText, baiduText, googleText, tencentText) {
         when (uiState.mapEngine) {
             MapEngine.AUTO -> autoText
             MapEngine.AMAP -> amapText
             MapEngine.BAIDU -> baiduText
             MapEngine.GOOGLE -> googleText
+            MapEngine.TENCENT -> tencentText
         }
     }
 

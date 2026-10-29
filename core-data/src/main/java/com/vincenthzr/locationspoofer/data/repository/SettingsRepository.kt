@@ -50,6 +50,12 @@ class SettingsRepository(private val settingsManager: SettingsManager) {
         settingsManager.googleApiKey = value
     }
 
+    fun getTencentApiKey(): String = settingsManager.tencentApiKey
+
+    fun setTencentApiKey(value: String) {
+        settingsManager.tencentApiKey = value
+    }
+
     fun getWigleApiToken(): String = settingsManager.wigleApiToken
 
     fun setWigleApiToken(value: String) {

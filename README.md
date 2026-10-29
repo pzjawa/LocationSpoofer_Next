@@ -51,7 +51,7 @@
         │                            │                            │
         ▼                            ▼                            ▼
   【空间定位与物理仿真】       【无线电与传感器模拟】         【反检测套件】
-  • 三地图引擎自由切换         • Wi-Fi 扫描与连接态伪装       • Xposed 堆栈调用帧清洗
+  • 四地图引擎自由切换         • Wi-Fi 扫描与连接态伪装       • Xposed 堆栈调用帧清洗
   • WGS-84/GCJ-02/BD-09 自适应 • 2G-5G NR 蜂窝基站小区模拟   • ClassLoader 探测隔离
   • Ornstein-Uhlenbeck 抖动    • BLE 蓝牙信标扫描过滤         • isFromMockProvider 抹除
   • 步态横向摇摆与高斯噪声     • WiGLE / OpenCellID 云端导入  • AppOps OP_MOCK_LOCATION 隐藏
@@ -60,9 +60,11 @@
 ```
 
 ### 1. 多地图引擎与坐标系适配
-* **三引擎自由切换**：集成高德 3D 地图 (AMap)、百度地图 (BaiduMap) 与 Google Maps，满足境内外不同场景下的路网检索与 POI 选点需求。
+* **四引擎自由切换**：集成高德 3D 地图 (AMap)、百度地图 (BaiduMap)、Google Maps 与腾讯地图，支持不同底图上的位置选点与路线显示。
 * **开箱即用与全语言支持**：默认“自动匹配”在所有语言（包括中文、英文、阿拉伯语等）环境下均稳定选用高德地图，无需 Google 服务或特殊网络即可顺畅使用。
 * **Google 地图自定义 Key**：App 不内置任何 Google Maps 默认密钥；如需使用 Google 地图渲染与 Places 全球搜索，只需在“设置”中填入您自行申请的 Google API Key 即可。
+* **腾讯地图**：使用地图 SDK 6.15.1。在“设置 → 地图配置”选择腾讯，填入自行申请的 Android 地图 SDK Key 并保存；首次打开需要阅读并同意腾讯地图隐私规则。不内置腾讯 Key，也不会因缺少 Key 静默切换其他引擎。开发构建可通过环境变量 `TENCENT_MAPS_API_KEY` 或根目录 `local.yml` 的 `TENCENT_MAPS_API_KEY: "你的Key"` 配置默认 Key，应用内自定义 Key 优先。请在[腾讯位置服务控制台](https://lbs.qq.com/dev/console/application/mine)为 Key 启用地图 SDK，并配置包名 `com.vincenthzr.locationspoofer`。腾讯底图沿用 GCJ-02，地址搜索与路线规划仍使用现有服务；API 密钥仅在导出时显式勾选密钥分类才会包含，隐私同意状态不随数据包导出。
+* **16 KB 原生库对齐**：高德使用 `3dmap-location-search:11.3.100_loc11.3.101_sea9.8.1` 合包，不再重复引入独立定位/搜索包；百度地图和检索为 `7.6.6`，定位为 `9.6.5`。arm64 APK 需同时检查 ELF `LOAD` 段对齐（至少 `0x4000`）与 ZIP 对齐；仅签名校验通过或在 4 KB 页面设备上启动，不能证明 16 KB 兼容。
 * **智能坐标系自适应（Smart Auto）**：
   * 系统原生接口统一输出标准 `WGS-84` 物理坐标与卫星数据；
   * 各大地图定位 SDK（高德/腾讯/百度）及视图渲染层（如百度地图蓝点 `MyLocationData`）自动映射对应坐标系（`GCJ-02` / `BD-09`），规避坐标偏移与 `(0.0, 0.0)` 兜底问题；
@@ -152,8 +154,8 @@
 ┌─────────────────────────────────────────────────────────────────────────┐
 │     LocationSpoofer 宿主进程（app / app-ui / service / core-data）      │
 │  ┌─────────────────────────┐  ┌──────────────────────────────────────┐  │
-│  │     Triple Map Engine   │  │          RouteStateMachine           │  │
-│  │ (AMap / Baidu / Google) │  │     (IDLE / READY / RUN / PAUSE)     │  │
+│  │     Four Map Engines    │  │          RouteStateMachine           │  │
+│  │ AMap/Baidu/Google/Tencent│  │     (IDLE / READY / RUN / PAUSE)     │  │
 │  └────────────┬────────────┘  └──────────────────┬───────────────────┘  │
 │               │                                  │                      │
 │  ┌────────────▼──────────────────────────────────▼───────────────────┐  │
@@ -217,15 +219,20 @@
 # 1. 克隆代码仓库
 git clone https://github.com/your-username/LocationSpoofer.git
 
-# 2. 编译 Debug APK 并直接安装到设备
-./gradlew installDebug
+# 2. 全局版：编译并安装（Hook 系统进程）
+./gradlew :app:installGlobalDebug
+#
+# 或选择非全局作用域版：只 Hook LSPosed 里勾选的目标应用
+# ./gradlew :app:installScopedDebug
 ```
+
+两个方案二选一安装，同包名会相互替换；只有 `global` 包提供系统级全局设置，`scoped` 包不显示这些入口。arm64 APK 分别位于 `app/build/outputs/apk/global/debug/`、`app/build/outputs/apk/scoped/debug/`。
 
 ### 2. 权限与激活
 1. 打开 **KernelSU / APatch / Magisk** 管理器，授予 LocationSpoofer **Root 权限**。
 2. 打开 **LSPosed** 管理器，在模块列表中找到 **LocationSpoofer** 并启用。
-3. 在模块的作用域（Scope）中，**勾选需要进行定位伪装的目标应用**（如微信、企业微信、钉钉、超星学习通、百度地图、高德地图等）。
-4. **强行停止**勾选的目标 App（或重启手机）以使其加载 Hook 逻辑。
+3. 全局版在模块作用域中勾选**系统框架、电话、蓝牙**；作用域版勾选需要进行定位伪装的目标应用。
+4. 全局版启用或切换方案后**重启手机**使系统进程加载 Hook；作用域版可强行停止勾选的目标 App 后重新打开。
 
 ### 3. 常见场景
 
@@ -262,7 +269,7 @@ git clone https://github.com/your-username/LocationSpoofer.git
 * **依赖注入**：Koin，按模块拆分为 `coreDataModule` / `serviceModule` / `viewModelModule` 三个子模块，由 `app` 模块的 `appModules` 统一聚合注册
 * **持久化存储**：Room Database (SQLite) + 空间索引（`core-data` 模块）
 * **网络与序列化**：OkHttp 3 + Kotlinx Serialization
-* **地图组件**：AMap 3DMap SDK / BaiduMap SDK / Google Maps & Places SDK
+* **地图组件**：AMap 11.3.100（地图/定位/搜索合包）/ BaiduMap 7.6.6 + Location 9.6.5 / Google Maps & Places SDK / Tencent Map SDK 6.15.1（含 foundation）
 * **Xposed 框架**：LSPosed API 101+ / libxposed (Service 模式)，Hook 实现位于 `xposed` 模块的 `hooks/` 与 `hooks/network/` 子包
 
 ---

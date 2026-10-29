@@ -195,6 +195,12 @@ fun MapTypeDialog(
                             },
                             modifier = Modifier.weight(1f)
                         )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
 
                         MiuixEngineOptionCard(
                             title = stringResource(R.string.map_engine_google),
@@ -202,6 +208,17 @@ fun MapTypeDialog(
                             isSelected = currentMapEngine == MapEngine.GOOGLE,
                             onClick = {
                                 onMapEngineSelected(MapEngine.GOOGLE)
+                                onDismiss()
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        MiuixEngineOptionCard(
+                            title = stringResource(R.string.engine_tencent),
+                            icon = Icons.Rounded.Map,
+                            isSelected = currentMapEngine == MapEngine.TENCENT,
+                            onClick = {
+                                onMapEngineSelected(MapEngine.TENCENT)
                                 onDismiss()
                             },
                             modifier = Modifier.weight(1f)

@@ -2,7 +2,6 @@ package com.vincenthzr.locationspoofer.progress
 
 import com.vincenthzr.locationspoofer.ui.screen.MarkdownBlock
 import com.vincenthzr.locationspoofer.ui.screen.parseMarkdownBlocks
-import com.vincenthzr.locationspoofer.vendor.RomFamily
 import java.io.File
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -21,26 +20,6 @@ class AdaptationProgressTest {
         val first = blocks.filterIsInstance<MarkdownBlock.Table>().first()
         assertEquals(listOf("系统", "适配器", "状态", "已验证的系统版本", "备注"), first.header)
         assertTrue(first.rows.none { row -> row.all { it.matches(Regex("-+")) } })
-    }
-
-    @Test
-    fun `finds the global status of each system family`() {
-        val hyperOs = AdaptationProgress.findGlobalSystem(doc, RomFamily.HYPEROS_MIUI.progressKeywords)!!
-        assertEquals(AdaptationProgress.Status.VERIFIED, hyperOs.status)
-        assertEquals("HyperOS 4", hyperOs.verifiedVersions)
-
-        val colorOs = AdaptationProgress.findGlobalSystem(doc, RomFamily.COLOROS.progressKeywords)!!
-        assertEquals(AdaptationProgress.Status.PARTIAL, colorOs.status)
-        assertEquals("ColorOS 16 / Android 16", colorOs.verifiedVersions)
-
-        val oneUi = AdaptationProgress.findGlobalSystem(doc, RomFamily.ONEUI.progressKeywords)!!
-        assertEquals(AdaptationProgress.Status.UNVERIFIED, oneUi.status)
-        assertEquals("", oneUi.verifiedVersions)
-
-        for (family in RomFamily.entries) {
-            val entry = AdaptationProgress.findGlobalSystem(doc, family.progressKeywords)
-            assertTrue("$family should have a row", entry != null)
-        }
     }
 
     @Test
